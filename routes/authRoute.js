@@ -6,12 +6,13 @@ const {
   getAUser,
   deleteAUser,
 } = require("../controller/userCtrl");
+const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 const router = express.Router();
 
 router.post("/register", createUser);
 router.post("/login", loginUserCtrl);
 router.get("/all-users", getAllUser);
-router.get("/:id", getAUser);
+router.get("/:id", authMiddleware, isAdmin, getAUser);
 router.delete("/:id", deleteAUser);
 
 module.exports = router;
