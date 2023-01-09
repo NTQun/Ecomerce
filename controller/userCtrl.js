@@ -42,6 +42,29 @@ const getAllUser = asyncHandler(async (req, res) => {
   }
 });
 
+// Update a user
+
+const updateUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updateUser = await User.findByIdAndUpdate(
+      id,
+      {
+        firstName: req?.body.firstName,
+        lastName: req?.body.lastName,
+        email: req?.body.email,
+        mobile: req?.body.mobile,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(updateUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 //Get a single user
 
 const getAUser = asyncHandler(async (req, res) => {
@@ -76,4 +99,5 @@ module.exports = {
   getAllUser,
   getAUser,
   deleteAUser,
+  updateUser,
 };
