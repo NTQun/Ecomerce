@@ -1,6 +1,8 @@
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require("../config/jswToken");
+const validateMongodbId = require("../utils/validateMongodbId");
+
 const createUser = asyncHandler(async (req, res) => {
   const email = req.body.email;
   const findUser = await User.findOne({ email: email });
@@ -46,6 +48,7 @@ const getAllUser = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.user;
+  validateMongodbId(id);
   try {
     const updateUser = await User.findByIdAndUpdate(
       id,
@@ -69,6 +72,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
 const getAUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  validateMongodbId(id);
   try {
     const getaUser = await User.findById(id);
     res.json({
@@ -95,6 +99,7 @@ const deleteAUser = asyncHandler(async (req, res) => {
 
 const blockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  validateMongodbId(id);
   try {
     const block = await User.findByIdAndUpdate(
       id,
@@ -105,13 +110,14 @@ const blockUser = asyncHandler(async (req, res) => {
         new: true,
       }
     );
-    res.json({ message: " User Blocked" });
+    res.json({ message: " User Blocked", block });
   } catch (error) {
     throw new Error(error);
   }
 });
 const unblockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  validateMongodbId(id);
   try {
     const unblock = await User.findByIdAndUpdate(
       id,
@@ -122,7 +128,7 @@ const unblockUser = asyncHandler(async (req, res) => {
         new: true,
       }
     );
-    res.json({ message: " User UnBlocked" });
+    res.json({ message: " User UnBlocked", unblock });
   } catch (error) {
     throw new Error(error);
   }
