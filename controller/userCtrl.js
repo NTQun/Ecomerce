@@ -2,7 +2,9 @@ const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require("../config/jswToken");
 const validateMongodbId = require("../utils/validateMongodbId");
-
+const { generateRefreshToken } = require("../config/refreshToken");
+const jwt = require("jsonwebtoken");
+// create a user
 const createUser = asyncHandler(async (req, res) => {
   const email = req.body.email;
   const findUser = await User.findOne({ email: email });
@@ -14,12 +16,24 @@ const createUser = asyncHandler(async (req, res) => {
     throw new Error("User already Exists");
   }
 });
-
+// Login a user
 const loginUserCtrl = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   //check if user exists or not
   const findUser = await User.findOne({ email });
   if (findUser && (await findUser.isPasswordMatched(password))) {
+    const refreshToken = await generateRefreshToken(findUser?._id);
+    const updateuser = await User.findByIdAndUpdate(
+      findUser.id,
+      {
+        refreshToken: refreshToken,
+      },
+      { new: true }
+    );
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 72 * 60 * 60 * 1000,
+    });
     res.json({
       _id: findUser?.id,
       firstName: findUser?.firstName,
@@ -33,15 +47,23 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
   }
 });
 
-//Get all user
+// Handle refresh token
 
-const getAllUser = asyncHandler(async (req, res) => {
-  try {
-    const getUSers = await User.find();
-    res.json(getUSers);
-  } catch (error) {
-    throw new Error(error);
-  }
+const handleRefreshToken = asyncHandler(async (req, res) => {
+  const cookie = req.cookies;
+  console.log(cookie);
+  if (!cookie?.refreshToken) throw new Error("No Refresh Token in cookies");
+  const refreshToken = cookie.refreshToken;
+  console.log(refreshToken);
+  const user = await User.findOne({ refreshToken });
+  if (!user) throw new Error("No refresh token presen in db or not matched");
+  jwt.verify(refreshToken, process.env.JWT_SECRET, (err, decoded) => {
+    if (err || user.id !== decoded.id) {
+      throw new Error("There is something wrong refresh token");
+    }
+    const accessToken = generateToken(user?._id);
+    res.json({ accessToken });
+  });
 });
 
 // Update a user
@@ -63,6 +85,17 @@ const updateUser = asyncHandler(async (req, res) => {
       }
     );
     res.json(updateUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+//Get all user
+
+const getAllUser = asyncHandler(async (req, res) => {
+  try {
+    const getUSers = await User.find();
+    res.json(getUSers);
   } catch (error) {
     throw new Error(error);
   }
@@ -143,4 +176,5 @@ module.exports = {
   updateUser,
   blockUser,
   unblockUser,
+  handleRefreshToken,
 };
