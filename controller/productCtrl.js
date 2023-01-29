@@ -108,12 +108,12 @@ const addToWishList = asyncHandler(async (req, res) => {
   const { proId } = req.body;
   try {
     const user = await User.findById(_id);
-    const alreadyadded = user.wishList.find((id) => id.toString() === proId);
+    const alreadyadded = user.wishlist.find((id) => id.toString() === proId);
     if (alreadyadded) {
       let user = await User.findOneAndUpdate(
         _id,
         {
-          $pull: { wishList: proId },
+          $pull: { wishlist: proId },
         },
         {
           new: true,
@@ -124,7 +124,7 @@ const addToWishList = asyncHandler(async (req, res) => {
       let user = await User.findOneAndUpdate(
         _id,
         {
-          $push: { wishList: proId },
+          $push: { wishlist: proId },
         },
         {
           new: true,
