@@ -39,11 +39,7 @@ var blogSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    images: {
-      type: String,
-      default:
-        "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.techtarget.com%2Fwhatis%2Fdefinition%2Fweblog&psig=AOvVaw0hRNCqkF3ZhQQ0BvIsPcXE&ust=1673754202281000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCIDDwLeSxvwCFQAAAAAdAAAAABAE",
-    },
+    images: [],
     author: {
       type: String,
       default: "Admin",

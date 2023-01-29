@@ -2,6 +2,9 @@ const Product = require("../models/productModel");
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const slugfify = require("slugify");
+const validateMongodbId = require("../utils/validateMongodbId");
+const cloudinaryUploadImg = require("../utils/cloudinary");
+
 const createProduct = asyncHandler(async (req, res) => {
   try {
     if (req.body.title) {
@@ -16,6 +19,7 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const updateProduct = asyncHandler(async (req, res) => {
   const id = req.params;
+  validateMongodbId(id);
   try {
     if (req.body.title) {
       req.body.slug = slugfify(req.body.title);
@@ -51,6 +55,7 @@ const getaProduct = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+
 const getAllProduct = asyncHandler(async (req, res) => {
   try {
     // Filtering
@@ -130,7 +135,6 @@ const addToWishList = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
-
 const rating = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { star, proId, comment } = req.body;
@@ -185,6 +189,36 @@ const rating = asyncHandler(async (req, res) => {
   }
 });
 
+const uploadImages = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+  try {
+    const uploader = (path) => cloudinaryUploadImg(path, "images");
+    const urls = [];
+    const files = req.files;
+    for (const file of files) {
+      const { path } = file;
+      let newpath = await uploader(path);
+      console.log(path);
+      urls.push(newpath);
+    }
+    const findProduct = await Product.findByIdAndUpdate(
+      id,
+      {
+        images: urls.map((file) => {
+          return file;
+        }),
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(findProduct);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createProduct,
   getaProduct,
@@ -193,4 +227,5 @@ module.exports = {
   deleteProduct,
   addToWishList,
   rating,
+  uploadImages,
 };
