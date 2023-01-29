@@ -1,4 +1,6 @@
 const User = require("../models/userModel");
+const Product = require("../models/productModel");
+const Cart = require("../models/cartModel");
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require("../config/jswToken");
 const validateMongodbId = require("../utils/validateMongodbId");
@@ -6,15 +8,19 @@ const { generateRefreshToken } = require("../config/refreshToken");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("./emailCtrl");
 const crypto = require("crypto");
+
 // create a user
 const createUser = asyncHandler(async (req, res) => {
+  // todo : Get the email from req..body
   const email = req.body.email;
+  // todo: With the help of email find the user exists or not
   const findUser = await User.findOne({ email: email });
   if (!findUser) {
-    //create new user
+    // todo: if user not found create new user
     const newUser = await User.create(req.body);
     res.json(newUser);
   } else {
+    // todo if user found then thon an error
     throw new Error("User already Exists");
   }
 });
@@ -304,6 +310,43 @@ const getWishList = asyncHandler(async (req, res) => {
   }
 });
 
+const userCart = asyncHandler(async (req, res) => {
+  const { cart } = req.body;
+  const { _id } = req.user;
+  validateMongodbId(_id);
+  console.log(req.body);
+  try {
+    let products = [];
+    const user = await User.findById(_id);
+    // Check if user already have product in cart
+    const alreadyExistCart = await Cart.findOne({ orderby: user._id });
+    if (alreadyExistCart) {
+      alreadyExistCart.remove();
+    }
+    for (let i = 0; i < cart.length; i++) {
+      let object = {};
+      object.product = cart[i]._id;
+      object.count = cart[i].count;
+      object.color = cart[i].color;
+      let getPrice = await Product.findById(cart[i]._id).select("price").exec();
+      object.price = getPrice.price;
+      products.push(object);
+    }
+    let cartTotal = 0;
+    for (let i = 0; i < products.length; i++) {
+      cartTotal = cartTotal + products[i].price * products[i].count;
+    }
+    let newCart = await new Cart({
+      products,
+      cartTotal,
+      orderby: user?._id,
+    }).save();
+    res.json(newCart);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createUser,
   loginUserCtrl,
@@ -321,4 +364,5 @@ module.exports = {
   loginAdmin,
   getWishList,
   saveAddress,
+  userCart,
 };
