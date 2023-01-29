@@ -3,6 +3,8 @@ const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const validateMongoDbId = require("../utils/validateMongodbId");
 const cloudinaryUploadImg = require("../utils/cloudinary");
+const fs = require("fs");
+
 const createBlog = asyncHandler(async (req, res) => {
   try {
     const newBlog = await Blog.create(req.body);
@@ -195,6 +197,7 @@ const uploadImages = asyncHandler(async (req, res) => {
       let newpath = await uploader(path);
       console.log(path);
       urls.push(newpath);
+      fs.unlinkSync(path);
     }
     const findBlog = await Blog.findByIdAndUpdate(
       id,
