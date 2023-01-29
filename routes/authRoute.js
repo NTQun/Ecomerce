@@ -15,6 +15,7 @@ const {
   resetPassword,
   loginAdmin,
   getWishList,
+  saveAddress,
 } = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -36,6 +37,8 @@ router.get("/:id", authMiddleware, isAdmin, getAUser);
 
 router.delete("/:id", deleteAUser);
 router.put("/edit-user", authMiddleware, updateUser);
+router.put("/save-address", authMiddleware, saveAddress);
+
 router.put("/block-user/:id", authMiddleware, isAdmin, blockUser);
 router.put("/unblock-user/:id", authMiddleware, isAdmin, unblockUser);
 
