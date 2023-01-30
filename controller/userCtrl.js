@@ -11,7 +11,6 @@ const { generateRefreshToken } = require("../config/refreshToken");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("./emailCtrl");
 const crypto = require("crypto");
-const e = require("express");
 
 // create a user
 const createUser = asyncHandler(async (req, res) => {
@@ -442,6 +441,19 @@ const createOrder = asyncHandler(async (req, res) => {
   }
 });
 
+const getOders = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  validateMongodbId(_id);
+  try {
+    const useroders = await Order.findOne({ orderby: _id })
+      .populate("products.product")
+      .exec();
+    res.json(useroders);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createUser,
   loginUserCtrl,
@@ -464,4 +476,5 @@ module.exports = {
   emptyCart,
   applyCoupon,
   createOrder,
+  getOders,
 };
