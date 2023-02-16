@@ -17,9 +17,11 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const { default: mongoose } = require("mongoose");
 
+const cors = require("cors");
 mongoose.set("strictQuery", true);
 dbConnect();
 app.use(morgan("dev"));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
