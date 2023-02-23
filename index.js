@@ -17,7 +17,7 @@ const enqRouter = require("./routes/enqRoute");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const { default: mongoose } = require("mongoose");
-
+const uploadRouter = require("./routes/uploadRoute");
 const cors = require("cors");
 mongoose.set("strictQuery", true);
 dbConnect();
@@ -36,6 +36,7 @@ app.use("/api/brand", brandRouter);
 app.use("/api/coupon", couponRouter);
 app.use("/api/color", colorRouter);
 app.use("/api/enquiry", enqRouter);
+app.use("/api/upload", uploadRouter);
 
 app.use(notFound);
 app.use(errorHandler);

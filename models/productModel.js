@@ -6,6 +6,7 @@ var productSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      trim: true,
     },
     slug: {
       type: String,
@@ -29,7 +30,6 @@ var productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     quantity: {
       type: Number,
       required: true,
@@ -38,7 +38,12 @@ var productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    images: [],
+    images: [
+      {
+        public_id: String,
+        url: String,
+      },
+    ],
     color: [],
     tags: [],
     ratings: [
