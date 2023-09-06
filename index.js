@@ -21,8 +21,6 @@ const uploadRouter = require("./routes/uploadRoute");
 const cors = require("cors");
 mongoose.set("strictQuery", true);
 dbConnect();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(cors());
 app.use(bodyParser.json());

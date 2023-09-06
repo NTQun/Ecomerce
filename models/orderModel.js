@@ -5,7 +5,7 @@ var orderSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Uer",
+      ref: "User",
       require: true,
     },
     shippingInfo: {
