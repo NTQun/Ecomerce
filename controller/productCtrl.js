@@ -138,38 +138,23 @@ const rating = asyncHandler(async (req, res) => {
   const { star, prodId, comment } = req.body;
   try {
     const product = await Product.findById(prodId);
-    let alreadyRated = product.ratings.find(
-      (userId) => userId.postedby.toString() === _id.toString()
-    );
-    if (alreadyRated) {
-      const updateRating = await Product.updateOne(
-        {
-          ratings: { $elemMatch: alreadyRated },
-        },
-        {
-          $set: { "ratings.$.star": star, "ratings.$.comment": comment },
-        },
-        {
-          new: true,
-        }
-      );
-    } else {
-      const rateProduct = await Product.findByIdAndUpdate(
-        prodId,
-        {
-          $push: {
-            ratings: {
-              star: star,
-              comment: comment,
-              postedby: _id,
-            },
+
+    const rateProduct = await Product.findByIdAndUpdate(
+      prodId,
+      {
+        $push: {
+          ratings: {
+            star: star,
+            comment: comment,
+            postedby: _id,
           },
         },
-        {
-          new: true,
-        }
-      );
-    }
+      },
+      {
+        new: true,
+      }
+    );
+    // }
     const getallratings = await Product.findById(prodId);
     let totalRating = getallratings.ratings.length;
     let ratingsum = getallratings.ratings
@@ -188,7 +173,26 @@ const rating = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+const getComment = asyncHandler(async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    const findProduct = await Product.findById(id);
+    const comment = [];
+    for (let index = 0; index < findProduct.ratings.length; index++) {
+      comment.push(findProduct.ratings[index].postedby);
+    }
+    const getComment = comment;
+    const user = [];
+    for (let index = 0; index < getComment.length; index++) {
+      const getUser = await User.findById(comment[index]);
+      user.push(getUser);
+    }
+    res.json(user);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 module.exports = {
   createProduct,
   getaProduct,
@@ -197,4 +201,5 @@ module.exports = {
   deleteProduct,
   addToWishlist,
   rating,
+  getComment,
 };

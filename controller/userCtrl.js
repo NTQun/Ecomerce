@@ -1,7 +1,6 @@
 const User = require("../models/userModel");
 const Cart = require("../models/cartModel");
 const Order = require("../models/orderModel");
-
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require("../config/jwtToken");
 const validateMongoDbId = require("../utils/validateMongodbId");
@@ -9,7 +8,6 @@ const { generateRefreshToken } = require("../config/refreshToken");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("./emailCtrl");
-
 // Create a User ----------------------------------------------
 
 const createUser = asyncHandler(async (req, res) => {
@@ -568,6 +566,33 @@ const getYearlyTotalOrders = asyncHandler(async (req, res) => {
   ]);
   res.json(data);
 });
+
+// const applyCoupon = asyncHandler(async (req, res) => {
+//   const { coupon } = req.body;
+
+//   const { _id } = req.user;
+//   validateMongoDbId(_id);
+//   const validCoupon = await Coupon.findOne({ name: coupon });
+//   if (validCoupon === null) {
+//     throw new Error("Invalid Coupon");
+//   }
+//   const user = await User.findOne({ _id });
+//   const data = await Cart.findOne({ orderby: user._id });
+//   let cartTotal = await Cart.find({
+//     orderby: user._id,
+//   }).populate("productId.product");
+//   console.log(data);
+//   let totalAfterDiscount = (
+//     cartTotal -
+//     (cartTotal * validCoupon.discount) / 100
+//   ).toFixed(2);
+//   await Cart.findOneAndUpdate(
+//     { orderby: user._id },
+//     { totalAfterDiscount },
+//     { new: true }
+//   );
+//   res.json(totalAfterDiscount);
+// });
 
 module.exports = {
   createUser,

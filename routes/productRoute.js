@@ -7,6 +7,7 @@ const {
   deleteProduct,
   addToWishlist,
   rating,
+  getComment,
 } = require("../controller/productCtrl");
 const { isAdmin, authMiddleware } = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -21,5 +22,6 @@ router.put("/:id", authMiddleware, isAdmin, updateProduct);
 router.delete("/:id", authMiddleware, isAdmin, deleteProduct);
 
 router.get("/", getAllProduct);
+router.get("/comment/:id", getComment);
 
 module.exports = router;
