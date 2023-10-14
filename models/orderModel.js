@@ -17,24 +17,20 @@ var orderSchema = new mongoose.Schema(
         type: String,
         require: true,
       },
+      mobile: { type: String, require: true },
+      email: { type: String, require: true },
+
       address: {
         type: String,
         require: true,
       },
-      city: {
-        type: String,
-        require: true,
-      },
-      state: {
-        type: String,
-        require: true,
-      },
+      // city: {
+      //   type: String,
+      //   require: true,
+      // },
+
       other: {
         type: String,
-        require: true,
-      },
-      pincode: {
-        type: Number,
         require: true,
       },
     },

@@ -30,5 +30,14 @@ const isAdmin = asyncHandler(async (req, res, next) => {
     next();
   }
 });
+const isDelivery = asyncHandler(async (req, res, next) => {
+  const { email } = req.user;
+  const deliveryUser = await User.findOne({ email });
+  if (deliveryUser.role !== "delivery") {
+    throw new Error("You are not an delivery");
+  } else {
+    next();
+  }
+});
 
-module.exports = { authMiddleware, isAdmin };
+module.exports = { authMiddleware, isAdmin, isDelivery };

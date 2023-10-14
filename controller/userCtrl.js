@@ -98,6 +98,39 @@ const loginAdmin = asyncHandler(async (req, res) => {
   }
 });
 
+const loginDelivery = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  // check if user exists or not
+  const findDelivery = await User.findOne({ email });
+  console.log(findDelivery.role);
+  if (findDelivery.role !== "delivery") throw new Error("Not Authorised");
+  // if (findDelivery && (await findDelivery.isPasswordMatched(password))) {
+  if (findDelivery) {
+    const refreshToken = await generateRefreshToken(findDelivery?._id);
+    const updateuser = await User.findByIdAndUpdate(
+      findDelivery.id,
+      {
+        refreshToken: refreshToken,
+      },
+      { new: true }
+    );
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 72 * 60 * 60 * 1000,
+    });
+    res.json({
+      _id: findDelivery?._id,
+      firstname: findDelivery?.firstname,
+      lastname: findDelivery?.lastname,
+      email: findDelivery?.email,
+      mobile: findDelivery?.mobile,
+      token: generateToken(findDelivery?._id),
+    });
+  } else {
+    throw new Error("Invalid Credentials");
+  }
+});
+
 // handle refresh token
 
 const handleRefreshToken = asyncHandler(async (req, res) => {
@@ -623,4 +656,5 @@ module.exports = {
   getSingleOrders,
   updateOrder,
   emptyCart,
+  loginDelivery,
 };
