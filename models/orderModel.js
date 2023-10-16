@@ -24,10 +24,6 @@ var orderSchema = new mongoose.Schema(
         type: String,
         require: true,
       },
-      // city: {
-      //   type: String,
-      //   require: true,
-      // },
 
       other: {
         type: String,
@@ -36,14 +32,12 @@ var orderSchema = new mongoose.Schema(
     },
     paymentInfo: {
       razorpayOrderId: {
-        // paypalpayOrderId: {
         type: String,
-        require: true,
+        // require: true,
       },
       razorpayPaymentId: {
-        // paypalPaymentId: {
         type: String,
-        require: true,
+        // require: true,
       },
     },
     orderItems: [

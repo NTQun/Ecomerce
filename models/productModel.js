@@ -22,6 +22,10 @@ var productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    importprice: {
+      type: Number,
+      required: true,
+    },
     category: {
       type: String,
       required: true,
