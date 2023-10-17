@@ -30,6 +30,10 @@ var orderSchema = new mongoose.Schema(
         require: true,
       },
     },
+    typecheckout: {
+      type: String,
+      require: true,
+    },
     paymentInfo: {
       razorpayOrderId: {
         type: String,
