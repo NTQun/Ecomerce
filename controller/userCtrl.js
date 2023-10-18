@@ -443,6 +443,7 @@ const createOrder = asyncHandler(async (req, res) => {
     totalPrice,
     totalPriceAfterDiscount,
     paymentInfo,
+    typecheckout,
   } = req.body;
   const { _id } = req.user;
   try {
@@ -452,6 +453,7 @@ const createOrder = asyncHandler(async (req, res) => {
       totalPrice,
       totalPriceAfterDiscount,
       paymentInfo,
+      typecheckout,
       user: _id,
     });
     res.json({ order, success: true });
@@ -475,7 +477,9 @@ const getMyOrders = asyncHandler(async (req, res) => {
 
 const getAllOrders = asyncHandler(async (req, res) => {
   try {
-    const orders = await Order.find().populate("user");
+    const orders = await Order.find()
+      .populate("user")
+      .populate("orderItems.product");
     res.json({
       orders,
     });
