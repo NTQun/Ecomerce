@@ -18,14 +18,14 @@ var productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    price: {
-      type: Number,
-      required: true,
-    },
-    importprice: {
-      type: Number,
-      required: true,
-    },
+    // price: {
+    //   type: Number,
+    //   required: true,
+    // },
+    // importprice: {
+    //   type: Number,
+    //   required: true,
+    // },
     category: {
       type: String,
       required: true,

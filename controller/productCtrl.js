@@ -1,4 +1,6 @@
 const Product = require("../models/productModel");
+const Warehouse = require("../models/warehoueModel");
+
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
@@ -47,7 +49,9 @@ const getaProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
   try {
-    const findProduct = await Product.findById(id).populate("color");
+    const findProduct = await Product.findById(id)
+      .populate("color")
+      .populate("ratings.postedby");
     res.json(findProduct);
   } catch (error) {
     throw new Error(error);
@@ -154,7 +158,6 @@ const rating = asyncHandler(async (req, res) => {
         new: true,
       }
     );
-    // }
     const getallratings = await Product.findById(prodId);
     let totalRating = getallratings.ratings.length;
     let ratingsum = getallratings.ratings
@@ -173,26 +176,85 @@ const rating = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
-const getComment = asyncHandler(async (req, res) => {
-  const { id } = req.params;
 
+const createWareProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoDbId(id);
   try {
-    const findProduct = await Product.findById(id);
-    const comment = [];
-    for (let index = 0; index < findProduct.ratings.length; index++) {
-      comment.push(findProduct.ratings[index].postedby);
-    }
-    const getComment = comment;
-    const user = [];
-    for (let index = 0; index < getComment.length; index++) {
-      const getUser = await User.findById(comment[index]);
-      user.push(getUser);
-    }
-    res.json(user);
+    const findProduct = await Warehouse.findOne({ product: id });
+    if (!findProduct) {
+      const newWareProduct = await Warehouse.create({
+        product: id,
+      });
+      res.json(newWareProduct);
+    } else res.json("Product already in warehouse");
   } catch (error) {
     throw new Error(error);
   }
 });
+
+const getWarehouse = asyncHandler(async (req, res) => {
+  try {
+    const getWarehouse = await Warehouse.find().populate("product");
+    res.json(getWarehouse);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const getAWarehouse = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const getWarehouse = await Warehouse.findById(id).populate("product");
+    res.json(getWarehouse);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const updateWarehouse = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoDbId(id);
+  try {
+    const updateWarehouse = await Warehouse.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+    res.json(updateWarehouse);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const importWarehouse = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { quantity, importprice, price } = req.body;
+  validateMongoDbId(id);
+  try {
+    const updateWarehouse = await Warehouse.findById(id);
+
+    updateWarehouse.quantity = quantity
+      ? updateWarehouse.quantity + quantity
+      : updateWarehouse.quantity;
+    updateWarehouse.importprice = importprice
+      ? importprice
+      : updateWarehouse.importprice;
+    updateWarehouse.price = price ? price : updateWarehouse.price;
+    updateWarehouse.save();
+    res.json(updateWarehouse);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const deleteProductWarehouse = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoDbId(id);
+  try {
+    const deletewh = await Warehouse.findByIdAndDelete(id);
+    res.json(deletewh);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createProduct,
   getaProduct,
@@ -201,5 +263,10 @@ module.exports = {
   deleteProduct,
   addToWishlist,
   rating,
-  getComment,
+  createWareProduct,
+  getWarehouse,
+  updateWarehouse,
+  importWarehouse,
+  getAWarehouse,
+  deleteProductWarehouse,
 };

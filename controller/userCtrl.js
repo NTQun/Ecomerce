@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Address = require("../models/addressModel");
 const Cart = require("../models/cartModel");
 const Order = require("../models/orderModel");
 const asyncHandler = require("express-async-handler");
@@ -197,28 +198,6 @@ const updatedUser = asyncHandler(async (req, res) => {
   }
 });
 
-// save user Address
-
-const saveAddress = asyncHandler(async (req, res, next) => {
-  const { _id } = req.user;
-  validateMongoDbId(_id);
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(
-      _id,
-      {
-        address: req?.body?.address,
-      },
-      {
-        new: true,
-      }
-    );
-    res.json(updatedUser);
-  } catch (error) {
-    throw new Error(error);
-  }
-});
-
 // Get all users
 
 const getallUser = asyncHandler(async (req, res) => {
@@ -364,6 +343,74 @@ const getWishlist = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+
+// save user Address
+const saveAddress = asyncHandler(async (req, res, next) => {
+  const address = req.body;
+  const { _id } = req.user;
+  validateMongoDbId(_id);
+  try {
+    let newCart = await new Address({
+      userId: _id,
+      address: address.address,
+    }).save();
+    res.json(newCart);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const getAddress = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  validateMongoDbId(_id);
+  try {
+    const address = await Address.find({ userId: _id });
+    res.json(address);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const getoneAdress = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoDbId(id);
+  try {
+    const address = await Address.findById(id);
+    res.json(address);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const updateAddress = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const address = req.body;
+
+  validateMongoDbId(id);
+  try {
+    const newaddress = await Address.findByIdAndUpdate(
+      id,
+      {
+        address: address.address,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(newaddress);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const deleteAdd = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  validateMongoDbId(id);
+  try {
+    const newaddress = await Address.findByIdAndDelete(id);
+    res.json(newaddress);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+//Address
 
 const userCart = asyncHandler(async (req, res) => {
   const { productId, color, quantity, price } = req.body;
@@ -661,4 +708,8 @@ module.exports = {
   updateOrder,
   emptyCart,
   loginDelivery,
+  getAddress,
+  updateAddress,
+  deleteAdd,
+  getoneAdress,
 };

@@ -29,6 +29,10 @@ const {
   emptyCart,
   updateOrder,
   loginDelivery,
+  getAddress,
+  updateAddress,
+  deleteAdd,
+  getoneAdress,
 } = require("../controller/userCtrl");
 const {
   authMiddleware,
@@ -43,6 +47,8 @@ router.post("/forgot-password-token", forgotPasswordToken);
 
 router.put("/reset-password/:token", resetPassword);
 router.put("/updateOrder/:id", authMiddleware, isAdmin, updateOrder);
+router.put("/cancel/:id", authMiddleware, updateOrder);
+
 router.put(
   "/delivery-updateOrder/:id",
   authMiddleware,
@@ -70,6 +76,8 @@ router.get(
   getSingleOrders
 );
 router.get("/delivery-getallorders", authMiddleware, isDelivery, getAllOrders);
+router.get("/address", authMiddleware, getAddress);
+router.get("/address/:id", authMiddleware, getoneAdress);
 
 router.get("/getallorders", authMiddleware, isAdmin, getAllOrders);
 router.get("/getmyorders", authMiddleware, getMyOrders);
@@ -93,8 +101,11 @@ router.delete(
   authMiddleware,
   updateProductQuantityFromCart
 );
+router.delete("/delete-address/:id", authMiddleware, deleteAdd);
 router.put("/edit-user", authMiddleware, updatedUser);
-router.put("/save-address", authMiddleware, saveAddress);
+router.put("/update-address/:id", authMiddleware, updateAddress);
+
+router.post("/save-address", authMiddleware, saveAddress);
 
 router.put("/block-user/:id", authMiddleware, isAdmin, blockUser);
 router.put("/unblock-user/:id", authMiddleware, isAdmin, unblockUser);

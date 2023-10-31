@@ -24,11 +24,6 @@ var orderSchema = new mongoose.Schema(
         type: String,
         require: true,
       },
-
-      other: {
-        type: String,
-        require: true,
-      },
     },
     typecheckout: {
       type: String,
