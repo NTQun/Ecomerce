@@ -24,10 +24,10 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
 const isAdmin = asyncHandler(async (req, res, next) => {
   const { email } = req.user;
   const adminUser = await User.findOne({ email });
-  if (adminUser.role !== "admin") {
-    throw new Error("You are not an admin");
-  } else {
+  if (adminUser.role == "admin" || adminUser.role == "manager") {
     next();
+  } else {
+    throw new Error("You are not an admin");
   }
 });
 const isDelivery = asyncHandler(async (req, res, next) => {

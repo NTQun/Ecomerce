@@ -28,11 +28,12 @@ const {
   getallUser,
   emptyCart,
   updateOrder,
-  loginDelivery,
   getAddress,
   updateAddress,
   deleteAdd,
   getoneAdress,
+  findUser,
+  updateAccount,
 } = require("../controller/userCtrl");
 const {
   authMiddleware,
@@ -61,7 +62,6 @@ router.post("/login", loginUserCtrl);
 router.delete("/empty", authMiddleware, emptyCart);
 
 router.post("/admin-login", loginAdmin);
-router.post("/delivery-login", loginDelivery);
 
 router.post("/cart", authMiddleware, userCart);
 router.post("/order/checkout", authMiddleware, checkout);
@@ -78,6 +78,7 @@ router.get(
 router.get("/delivery-getallorders", authMiddleware, isDelivery, getAllOrders);
 router.get("/address", authMiddleware, getAddress);
 router.get("/address/:id", authMiddleware, getoneAdress);
+router.get("/", authMiddleware, findUser);
 
 router.get("/getallorders", authMiddleware, isAdmin, getAllOrders);
 router.get("/getmyorders", authMiddleware, getMyOrders);
@@ -94,7 +95,7 @@ router.delete(
   authMiddleware,
   removeProductFromCart
 );
-router.delete("/:id", deleteaUser);
+router.delete("/:id", authMiddleware, isAdmin, deleteaUser);
 
 router.delete(
   "/update-product-cart/:cartItemId/:newQuantity",
@@ -103,6 +104,8 @@ router.delete(
 );
 router.delete("/delete-address/:id", authMiddleware, deleteAdd);
 router.put("/edit-user", authMiddleware, updatedUser);
+router.put("/edit-user/:id", authMiddleware, updateAccount);
+
 router.put("/update-address/:id", authMiddleware, updateAddress);
 
 router.post("/save-address", authMiddleware, saveAddress);

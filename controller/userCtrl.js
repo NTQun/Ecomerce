@@ -35,6 +35,13 @@ const createUser = asyncHandler(async (req, res) => {
   }
 });
 
+const findUser = asyncHandler(async (req, res) => {
+  const findU = await User.find();
+  res.json(findU);
+
+  throw new Error("User Already Exists");
+});
+
 // Login a user
 const loginUserCtrl = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -59,6 +66,7 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
       lastname: findUser?.lastname,
       email: findUser?.email,
       mobile: findUser?.mobile,
+      role: findUser?.role,
       token: generateToken(findUser?._id),
     });
   } else {
@@ -72,7 +80,9 @@ const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   // check if user exists or not
   const findAdmin = await User.findOne({ email });
-  if (findAdmin.role !== "admin") throw new Error("Not Authorised");
+  console.log(findAdmin);
+  if (findAdmin.role != "admin" && findAdmin.role != "manager")
+    throw new Error("Not Authorised");
   if (findAdmin && (await findAdmin.isPasswordMatched(password))) {
     const refreshToken = await generateRefreshToken(findAdmin?._id);
     const updateuser = await User.findByIdAndUpdate(
@@ -93,39 +103,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
       email: findAdmin?.email,
       mobile: findAdmin?.mobile,
       token: generateToken(findAdmin?._id),
-    });
-  } else {
-    throw new Error("Invalid Credentials");
-  }
-});
-
-const loginDelivery = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  // check if user exists or not
-  const findDelivery = await User.findOne({ email });
-  console.log(findDelivery.role);
-  if (findDelivery.role !== "delivery") throw new Error("Not Authorised");
-  // if (findDelivery && (await findDelivery.isPasswordMatched(password))) {
-  if (findDelivery) {
-    const refreshToken = await generateRefreshToken(findDelivery?._id);
-    const updateuser = await User.findByIdAndUpdate(
-      findDelivery.id,
-      {
-        refreshToken: refreshToken,
-      },
-      { new: true }
-    );
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 72 * 60 * 60 * 1000,
-    });
-    res.json({
-      _id: findDelivery?._id,
-      firstname: findDelivery?.firstname,
-      lastname: findDelivery?.lastname,
-      email: findDelivery?.email,
-      mobile: findDelivery?.mobile,
-      token: generateToken(findDelivery?._id),
+      role: findAdmin?.role,
     });
   } else {
     throw new Error("Invalid Credentials");
@@ -198,6 +176,28 @@ const updatedUser = asyncHandler(async (req, res) => {
   }
 });
 
+const updateAccount = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoDbId(id);
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        firstname: req?.body?.firstname,
+        lastname: req?.body?.lastname,
+        email: req?.body?.email,
+        mobile: req?.body?.mobile,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(updatedUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 // Get all users
 
 const getallUser = asyncHandler(async (req, res) => {
@@ -217,9 +217,7 @@ const getaUser = asyncHandler(async (req, res) => {
 
   try {
     const getaUser = await User.findById(id);
-    res.json({
-      getaUser,
-    });
+    res.json(getaUser);
   } catch (error) {
     throw new Error(error);
   }
@@ -233,9 +231,7 @@ const deleteaUser = asyncHandler(async (req, res) => {
 
   try {
     const deleteaUser = await User.findByIdAndDelete(id);
-    res.json({
-      deleteaUser,
-    });
+    res.json(deleteaUser);
   } catch (error) {
     throw new Error(error);
   }
@@ -707,9 +703,10 @@ module.exports = {
   getSingleOrders,
   updateOrder,
   emptyCart,
-  loginDelivery,
   getAddress,
   updateAddress,
   deleteAdd,
   getoneAdress,
+  findUser,
+  updateAccount,
 };
