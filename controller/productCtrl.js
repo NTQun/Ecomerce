@@ -1,5 +1,6 @@
 const Product = require("../models/productModel");
 const Warehouse = require("../models/warehoueModel");
+const Order = require("../models/orderModel");
 
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
@@ -103,6 +104,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+
 const addToWishlist = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { prodId } = req.body;
@@ -182,6 +184,11 @@ const createWareProduct = asyncHandler(async (req, res) => {
   validateMongoDbId(id);
   try {
     const findProduct = await Warehouse.findOne({ product: id });
+    const updateProdcut = await Product.findByIdAndUpdate(
+      id,
+      { isWarehouse: true },
+      { new: true }
+    );
     if (!findProduct) {
       const newWareProduct = await Warehouse.create({
         product: id,
@@ -210,18 +217,6 @@ const getAWarehouse = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
-const updateWarehouse = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  validateMongoDbId(id);
-  try {
-    const updateWarehouse = await Warehouse.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
-    res.json(updateWarehouse);
-  } catch (error) {
-    throw new Error(error);
-  }
-});
 
 const importWarehouse = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -229,6 +224,15 @@ const importWarehouse = asyncHandler(async (req, res) => {
   validateMongoDbId(id);
   try {
     const updateWarehouse = await Warehouse.findById(id);
+    const productId = updateWarehouse.product;
+    const product = await Product.findById(productId);
+
+    product.quantity = quantity
+      ? product.quantity + quantity
+      : product.quantity;
+    product.importprice = importprice ? importprice : product.importprice;
+    product.price = price ? price : product.price;
+    product.save();
 
     updateWarehouse.quantity = quantity
       ? updateWarehouse.quantity + quantity
@@ -238,6 +242,11 @@ const importWarehouse = asyncHandler(async (req, res) => {
       : updateWarehouse.importprice;
     updateWarehouse.price = price ? price : updateWarehouse.price;
     updateWarehouse.save();
+
+    product.quantity = updateWarehouse.quantity;
+    product.importprice = updateWarehouse.importprice;
+    product.price = updateWarehouse.price;
+    product.save();
     res.json(updateWarehouse);
   } catch (error) {
     throw new Error(error);
@@ -255,6 +264,43 @@ const deleteProductWarehouse = asyncHandler(async (req, res) => {
   }
 });
 
+const updateQuantityOrder = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { quantity } = req.body;
+  validateMongoDbId(id);
+  console.log(quantity);
+  try {
+    const updateWarehouse = await Warehouse.findOne({ product: id });
+    updateWarehouse.quantity = updateWarehouse.quantity - quantity;
+    updateWarehouse.save();
+    const product = await Product.findById(id);
+    product.quantity = product.quantity - quantity;
+    product.save();
+
+    res.json(updateWarehouse);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const updateQuantityCancel = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { quantity } = req.body;
+
+  validateMongoDbId(id);
+  try {
+    const updateWarehouse = await Warehouse.findOne({ product: id });
+    updateWarehouse.quantity = updateWarehouse.quantity + quantity;
+    updateWarehouse.save();
+
+    const product = await Product.findById(id);
+    product.quantity = product.quantity + quantity;
+    product.save();
+    res.json(updateWarehouse);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createProduct,
   getaProduct,
@@ -265,8 +311,10 @@ module.exports = {
   rating,
   createWareProduct,
   getWarehouse,
-  updateWarehouse,
+  // updateWarehouse,
   importWarehouse,
   getAWarehouse,
   deleteProductWarehouse,
+  updateQuantityCancel,
+  updateQuantityOrder,
 };

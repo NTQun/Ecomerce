@@ -9,10 +9,11 @@ const {
   rating,
   createWareProduct,
   getWarehouse,
-  updateWarehouse,
   importWarehouse,
   getAWarehouse,
   deleteProductWarehouse,
+  updateQuantityOrder,
+  updateQuantityCancel,
 } = require("../controller/productCtrl");
 const { isAdmin, authMiddleware } = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -29,9 +30,13 @@ router.put("/:id", authMiddleware, isAdmin, updateProduct);
 router.delete("/:id", authMiddleware, isAdmin, deleteProduct);
 
 router.get("/", getAllProduct);
-router.put("/update-warehouse/:id", updateWarehouse);
+// router.put("/update-warehouse/:id", updateWarehouse);
 router.post("/import-warehouse/:id", importWarehouse);
 router.post("/warehouse/:id", createWareProduct);
+
+router.post("/update-quantity-order/:id", updateQuantityOrder);
+router.post("/update-quantity-cancel/:id", updateQuantityCancel);
+
 router.delete("/warehouse/:id", deleteProductWarehouse);
 
 module.exports = router;

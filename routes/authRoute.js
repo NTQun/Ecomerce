@@ -34,6 +34,9 @@ const {
   getoneAdress,
   findUser,
   updateAccount,
+  commentOrder,
+  updateCommentOrder,
+  deleteCommentOrder,
 } = require("../controller/userCtrl");
 const {
   authMiddleware,
@@ -109,6 +112,10 @@ router.put("/edit-user/:id", authMiddleware, updateAccount);
 router.put("/update-address/:id", authMiddleware, updateAddress);
 
 router.post("/save-address", authMiddleware, saveAddress);
+router.put("/comment-order/:id", commentOrder);
+router.put("/comment-update/:id", updateCommentOrder);
+router.put("/comment-delete/:id", deleteCommentOrder);
+router.get("/single-order/:id", getSingleOrders);
 
 router.put("/block-user/:id", authMiddleware, isAdmin, blockUser);
 router.put("/unblock-user/:id", authMiddleware, isAdmin, unblockUser);

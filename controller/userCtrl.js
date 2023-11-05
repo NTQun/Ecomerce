@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const Address = require("../models/addressModel");
 const Cart = require("../models/cartModel");
 const Order = require("../models/orderModel");
+
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require("../config/jwtToken");
 const validateMongoDbId = require("../utils/validateMongodbId");
@@ -80,9 +81,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   // check if user exists or not
   const findAdmin = await User.findOne({ email });
-  console.log(findAdmin);
-  if (findAdmin.role != "admin" && findAdmin.role != "manager")
-    throw new Error("Not Authorised");
+  if (findAdmin.role == "user") throw new Error("Not Authorised");
   if (findAdmin && (await findAdmin.isPasswordMatched(password))) {
     const refreshToken = await generateRefreshToken(findAdmin?._id);
     const updateuser = await User.findByIdAndUpdate(
@@ -511,7 +510,8 @@ const getMyOrders = asyncHandler(async (req, res) => {
     const orders = await Order.find({ user: _id })
       .populate("user")
       .populate("orderItems.product")
-      .populate("orderItems.color");
+      .populate("orderItems.color")
+      .populate("comment");
     res.json(orders);
   } catch (error) {
     throw new Error(error);
@@ -537,9 +537,7 @@ const getSingleOrders = asyncHandler(async (req, res) => {
     const orders = await Order.findOne({ _id: id })
       .populate("orderItems.product")
       .populate("orderItems.color");
-    res.json({
-      orders,
-    });
+    res.json(orders);
   } catch (error) {
     throw new Error(error);
   }
@@ -674,6 +672,44 @@ const getYearlyTotalOrders = asyncHandler(async (req, res) => {
 //   res.json(totalAfterDiscount);
 // });
 
+const commentOrder = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { comment } = req.body;
+  try {
+    const orders = await Order.findByIdAndUpdate(id, req.body, { new: true });
+    // orders.comment = comment;
+    // orders.save();
+    res.json(orders);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const updateCommentOrder = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const orders = await Order.findByIdAndUpdate(id, req.body, { new: true });
+    // orders.comment = req.body;
+    // orders.save();
+
+    res.json(orders);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const deleteCommentOrder = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const orders = await Order.findByIdAndUpdate(id, req.body, { new: true });
+    // orders.comment = null;
+    // orders.save;
+    res.json(orders);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createUser,
   loginUserCtrl,
@@ -709,4 +745,7 @@ module.exports = {
   getoneAdress,
   findUser,
   updateAccount,
+  commentOrder,
+  updateCommentOrder,
+  deleteCommentOrder,
 };

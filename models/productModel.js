@@ -18,14 +18,7 @@ var productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // price: {
-    //   type: Number,
-    //   required: true,
-    // },
-    // importprice: {
-    //   type: Number,
-    //   required: true,
-    // },
+
     category: {
       type: String,
       required: true,
@@ -34,10 +27,7 @@ var productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    quantity: {
-      type: Number,
-      required: true,
-    },
+
     sold: {
       type: Number,
       default: 0,
@@ -60,6 +50,26 @@ var productSchema = new mongoose.Schema(
     totalrating: {
       type: String,
       default: 0,
+    },
+    price: {
+      type: Number,
+      default: 0,
+      // required: true,
+    },
+    importprice: {
+      type: Number,
+      default: 0,
+      // required: true,
+    },
+
+    quantity: {
+      type: Number,
+      default: 0,
+      // required: true,
+    },
+    isWarehouse: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
