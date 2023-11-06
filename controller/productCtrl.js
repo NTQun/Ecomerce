@@ -6,6 +6,7 @@ const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const validateMongoDbId = require("../utils/validateMongodbId");
+const warehoueModel = require("../models/warehoueModel");
 
 const createProduct = asyncHandler(async (req, res) => {
   try {
@@ -180,6 +181,7 @@ const rating = asyncHandler(async (req, res) => {
 });
 
 const createWareProduct = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
   const { id } = req.params;
   validateMongoDbId(id);
   try {
@@ -192,6 +194,7 @@ const createWareProduct = asyncHandler(async (req, res) => {
     if (!findProduct) {
       const newWareProduct = await Warehouse.create({
         product: id,
+        user: _id,
       });
       res.json(newWareProduct);
     } else res.json("Product already in warehouse");
@@ -202,7 +205,9 @@ const createWareProduct = asyncHandler(async (req, res) => {
 
 const getWarehouse = asyncHandler(async (req, res) => {
   try {
-    const getWarehouse = await Warehouse.find().populate("product");
+    const getWarehouse = await Warehouse.find()
+      .populate("product")
+      .populate("user");
     res.json(getWarehouse);
   } catch (error) {
     throw new Error(error);
@@ -211,7 +216,9 @@ const getWarehouse = asyncHandler(async (req, res) => {
 const getAWarehouse = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
-    const getWarehouse = await Warehouse.findById(id).populate("product");
+    const getWarehouse = await Warehouse.findById(id)
+      .populate("product")
+      .populate("user");
     res.json(getWarehouse);
   } catch (error) {
     throw new Error(error);
@@ -219,6 +226,7 @@ const getAWarehouse = asyncHandler(async (req, res) => {
 });
 
 const importWarehouse = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
   const { id } = req.params;
   const { quantity, importprice, price } = req.body;
   validateMongoDbId(id);
@@ -227,13 +235,8 @@ const importWarehouse = asyncHandler(async (req, res) => {
     const productId = updateWarehouse.product;
     const product = await Product.findById(productId);
 
-    product.quantity = quantity
-      ? product.quantity + quantity
-      : product.quantity;
-    product.importprice = importprice ? importprice : product.importprice;
-    product.price = price ? price : product.price;
-    product.save();
-
+    // update wherehouse
+    updateWarehouse.user = _id;
     updateWarehouse.quantity = quantity
       ? updateWarehouse.quantity + quantity
       : updateWarehouse.quantity;
@@ -311,7 +314,6 @@ module.exports = {
   rating,
   createWareProduct,
   getWarehouse,
-  // updateWarehouse,
   importWarehouse,
   getAWarehouse,
   deleteProductWarehouse,

@@ -31,8 +31,8 @@ router.delete("/:id", authMiddleware, isAdmin, deleteProduct);
 
 router.get("/", getAllProduct);
 // router.put("/update-warehouse/:id", updateWarehouse);
-router.post("/import-warehouse/:id", importWarehouse);
-router.post("/warehouse/:id", createWareProduct);
+router.post("/import-warehouse/:id", authMiddleware, importWarehouse);
+router.post("/warehouse/:id", authMiddleware, createWareProduct);
 
 router.post("/update-quantity-order/:id", updateQuantityOrder);
 router.post("/update-quantity-cancel/:id", updateQuantityCancel);
