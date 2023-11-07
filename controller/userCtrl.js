@@ -175,6 +175,26 @@ const updatedUser = asyncHandler(async (req, res) => {
   }
 });
 
+const updateRoleUser = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  validateMongoDbId(_id);
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      _id,
+      {
+        role: req.body,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(updatedUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 const updateAccount = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
@@ -536,7 +556,8 @@ const getSingleOrders = asyncHandler(async (req, res) => {
   try {
     const orders = await Order.findOne({ _id: id })
       .populate("orderItems.product")
-      .populate("orderItems.color");
+      .populate("orderItems.color")
+      .populate("orderShipper");
     res.json(orders);
   } catch (error) {
     throw new Error(error);
@@ -710,6 +731,38 @@ const deleteCommentOrder = asyncHandler(async (req, res) => {
   }
 });
 
+const addShipperforOrder = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { _id } = req.body;
+  validateMongoDbId(id);
+  try {
+    const orders = await Order.findByIdAndUpdate(
+      id,
+      { orderShipper: _id },
+      { new: true }
+    );
+
+    res.json(orders);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getOrderByShipper = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  validateMongoDbId(id);
+  try {
+    const orders = await Order.find({ orderShipper: id })
+      .populate("user")
+      .populate("orderItems.product")
+      .populate("orderItems.color")
+      .populate("comment");
+    res.json(orders);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createUser,
   loginUserCtrl,
@@ -748,4 +801,7 @@ module.exports = {
   commentOrder,
   updateCommentOrder,
   deleteCommentOrder,
+  addShipperforOrder,
+  updateRoleUser,
+  getOrderByShipper,
 };

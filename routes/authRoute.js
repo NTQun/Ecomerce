@@ -37,6 +37,9 @@ const {
   commentOrder,
   updateCommentOrder,
   deleteCommentOrder,
+  addShipperforOrder,
+  updateRoleUser,
+  getOrderByShipper,
 } = require("../controller/userCtrl");
 const {
   authMiddleware,
@@ -93,6 +96,7 @@ router.get("/cart", authMiddleware, getUserCart);
 router.get("/getMonthWiseOrderIncome", authMiddleware, getMonthWiseOrderIncome);
 router.get("/getYearlyTotalOrders", authMiddleware, getYearlyTotalOrders);
 router.get("/:id", authMiddleware, isAdmin, getaUser);
+
 router.delete(
   "/delete-product-cart/:cartItemId",
   authMiddleware,
@@ -116,8 +120,12 @@ router.put("/comment-order/:id", commentOrder);
 router.put("/comment-update/:id", updateCommentOrder);
 router.put("/comment-delete/:id", deleteCommentOrder);
 router.get("/single-order/:id", getSingleOrders);
+router.post("/order-by-shippper", authMiddleware, getOrderByShipper);
 
 router.put("/block-user/:id", authMiddleware, isAdmin, blockUser);
 router.put("/unblock-user/:id", authMiddleware, isAdmin, unblockUser);
+
+router.put("/add-shipper/:id", addShipperforOrder);
+router.put("/update-role/:id", authMiddleware, updateRoleUser);
 
 module.exports = router;

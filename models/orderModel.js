@@ -82,6 +82,11 @@ var orderSchema = new mongoose.Schema(
       default: "Ordered",
     },
     comment: { type: String },
+    orderShipper: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      unique: true,
+    },
   },
   {
     timestamps: true,
