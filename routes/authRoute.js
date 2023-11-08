@@ -120,7 +120,7 @@ router.put("/comment-order/:id", commentOrder);
 router.put("/comment-update/:id", updateCommentOrder);
 router.put("/comment-delete/:id", deleteCommentOrder);
 router.get("/single-order/:id", getSingleOrders);
-router.post("/order-by-shippper", authMiddleware, getOrderByShipper);
+router.post("/order-by-shippper/:id", getOrderByShipper);
 
 router.put("/block-user/:id", authMiddleware, isAdmin, blockUser);
 router.put("/unblock-user/:id", authMiddleware, isAdmin, unblockUser);

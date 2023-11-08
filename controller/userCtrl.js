@@ -542,7 +542,8 @@ const getAllOrders = asyncHandler(async (req, res) => {
   try {
     const orders = await Order.find()
       .populate("user")
-      .populate("orderItems.product");
+      .populate("orderItems.product")
+      .populate("orderShipper");
     res.json({
       orders,
     });
@@ -749,7 +750,7 @@ const addShipperforOrder = asyncHandler(async (req, res) => {
 });
 
 const getOrderByShipper = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+  const { id } = req.params;
   validateMongoDbId(id);
   try {
     const orders = await Order.find({ orderShipper: id })
