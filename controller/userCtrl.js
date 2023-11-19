@@ -10,6 +10,7 @@ const { generateRefreshToken } = require("../config/refreshToken");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("./emailCtrl");
+const { log } = require("console");
 // Create a User ----------------------------------------------
 
 const createUser = asyncHandler(async (req, res) => {
@@ -48,6 +49,9 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   // check if user exists or not
   const findUser = await User.findOne({ email });
+  if (findUser.isBlocked == true) {
+    throw new Error("Account User is Block ");
+  }
   if (findUser && (await findUser.isPasswordMatched(password))) {
     const refreshToken = await generateRefreshToken(findUser?._id);
     const updateuser = await User.findByIdAndUpdate(
@@ -82,6 +86,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
   // check if user exists or not
   const findAdmin = await User.findOne({ email });
   if (findAdmin.role == "user") throw new Error("Not Authorised");
+  if (findAdmin.isBlocked == true) throw new Error("Account is blocked");
   if (findAdmin && (await findAdmin.isPasswordMatched(password))) {
     const refreshToken = await generateRefreshToken(findAdmin?._id);
     const updateuser = await User.findByIdAndUpdate(
@@ -567,13 +572,18 @@ const getSingleOrders = asyncHandler(async (req, res) => {
 
 const updateOrder = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  validateMongoDbId(id);
+
+  console.log(req.body.status);
   try {
-    const orders = await Order.findById(id);
-    orders.orderStatus = req.body.status;
-    await orders.save();
-    res.json({
-      orders,
-    });
+    const orders = await Order.findByIdAndUpdate(
+      id,
+      { orderStatus: req.body.status },
+      { new: true }
+    );
+    // orders.orderStatus = req.body.status;
+    // await orders.save();
+    res.json(orders);
   } catch (error) {
     throw new Error(error);
   }
