@@ -544,14 +544,24 @@ const getMyOrders = asyncHandler(async (req, res) => {
 });
 
 const getAllOrders = asyncHandler(async (req, res) => {
+  const startTime = new Date(req.query.startTime);
+  const endTime = new Date(req.query.endTime);
   try {
-    const orders = await Order.find()
-      .populate("user")
-      .populate("orderItems.product")
-      .populate("orderShipper");
-    res.json({
-      orders,
-    });
+    if (req.query.startTime && req.query.endTime) {
+      const orders = await Order.find({
+        createdAt: { $gte: startTime, $lte: endTime },
+      })
+        .populate("user")
+        .populate("orderItems.product")
+        .populate("orderShipper");
+      res.json(orders);
+    } else {
+      const orders = await Order.find()
+        .populate("user")
+        .populate("orderItems.product")
+        .populate("orderShipper");
+      res.json(orders);
+    }
   } catch (error) {
     throw new Error(error);
   }
