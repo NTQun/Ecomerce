@@ -14,6 +14,8 @@ const {
   deleteProductWarehouse,
   updateQuantityOrder,
   updateQuantityCancel,
+  deleteRating,
+  updateRating,
 } = require("../controller/productCtrl");
 const { isAdmin, authMiddleware } = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -38,5 +40,7 @@ router.post("/update-quantity-order/:id", updateQuantityOrder);
 router.post("/update-quantity-cancel/:id", updateQuantityCancel);
 
 router.delete("/warehouse/:id", deleteProductWarehouse);
+router.put("/delete-rating/:id", deleteRating);
+router.put("/update-rating/:id", updateRating);
 
 module.exports = router;

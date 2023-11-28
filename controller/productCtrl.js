@@ -180,6 +180,45 @@ const rating = asyncHandler(async (req, res) => {
   }
 });
 
+const deleteRating = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { index } = req.body;
+  try {
+    const findProduct = await Product.findById(id);
+    findProduct.ratings.splice(index, 1);
+    findProduct.save();
+    res.json(findProduct);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const updateRating = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { index, comment, star } = req.body;
+  try {
+    const findProduct = await Product.findById(id);
+    findProduct.ratings[index].comment = comment;
+    findProduct.ratings[index].star = star;
+    findProduct.save();
+    let totalRating = findProduct.ratings.length;
+    let ratingsum = findProduct.ratings
+      .map((item) => item.star)
+      .reduce((prev, curr) => prev + curr, 0);
+    let actualRating = Math.round(ratingsum / totalRating);
+    let finalproduct = await Product.findByIdAndUpdate(
+      id,
+      {
+        totalrating: actualRating,
+      },
+      { new: true }
+    );
+    res.json(finalproduct);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 const createWareProduct = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { id } = req.params;
@@ -319,4 +358,6 @@ module.exports = {
   deleteProductWarehouse,
   updateQuantityCancel,
   updateQuantityOrder,
+  deleteRating,
+  updateRating,
 };
