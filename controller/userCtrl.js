@@ -769,6 +769,21 @@ const addShipperforOrder = asyncHandler(async (req, res) => {
   }
 });
 
+const deleteShipperforOrder = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoDbId(id);
+  try {
+    const orders = await Order.findByIdAndUpdate(
+      id,
+      { orderShipper: null },
+      { new: true }
+    );
+    res.json(orders);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 const getOrderByShipper = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
@@ -825,4 +840,5 @@ module.exports = {
   addShipperforOrder,
   updateRoleUser,
   getOrderByShipper,
+  deleteShipperforOrder,
 };

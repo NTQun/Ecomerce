@@ -40,6 +40,7 @@ const {
   addShipperforOrder,
   updateRoleUser,
   getOrderByShipper,
+  deleteShipperforOrder,
 } = require("../controller/userCtrl");
 const {
   authMiddleware,
@@ -75,13 +76,14 @@ router.post("/order/paymentVerification", authMiddleware, paymentVerrification);
 router.post("/cart/create-order", authMiddleware, createOrder);
 router.get("/all-users", getallUser);
 router.get("/getOrder/:id", authMiddleware, isAdmin, getSingleOrders);
-router.get(
-  "/delivery-getOrder/:id",
-  authMiddleware,
-  isDelivery,
-  getSingleOrders
-);
+router.get("/delivery-getOrder/:id", getSingleOrders);
 router.get("/delivery-getallorders", authMiddleware, isDelivery, getAllOrders);
+router.put(
+  "/delete-order-shipper/:id",
+
+  deleteShipperforOrder
+);
+
 router.get("/address", authMiddleware, getAddress);
 router.get("/address/:id", authMiddleware, getoneAdress);
 router.get("/", authMiddleware, findUser);
